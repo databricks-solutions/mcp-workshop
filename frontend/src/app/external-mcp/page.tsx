@@ -85,21 +85,75 @@ export default function ExternalMcpPage() {
             </p>
 
             <InfoBox type="warning" title="Prerequisites">
-              <p>You need <strong>CREATE CONNECTION</strong> privileges on the Unity Catalog metastore to create HTTP connections.</p>
+              <p className="mb-3">Before starting, you need:</p>
+              <ul className="space-y-2 ml-4">
+                <li>• <strong>CREATE CONNECTION</strong> privileges on the Unity Catalog metastore</li>
+                <li>• A <strong>GitHub repository</strong> (e.g., for testing repository operations)</li>
+                <li>• A <strong>GitHub Personal Access Token</strong> with <strong>repo-level permissions</strong> to that repository</li>
+              </ul>
+              <p className="mt-3 text-sm text-slate-600">
+                To create a GitHub token: Go to GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)
+              </p>
             </InfoBox>
 
             <div>
-              <h4 className="text-xl font-bold text-slate-900 mb-4">Create the HTTP Connection</h4>
+              <h4 className="text-xl font-bold text-slate-900 mb-4">Create the HTTP Connection via UI</h4>
               <p className="text-slate-700 mb-4">
-                In your Databricks workspace, navigate to <strong>Catalog</strong> → <strong>External Data</strong> → <strong>Connections</strong>
+                In your Databricks workspace, navigate to <strong>Catalog</strong> → <strong>External Data</strong> → <strong>Connections</strong>, then click <strong>Create connection</strong>.
               </p>
-              
-              <CodeBlock
-                language="sql"
-                title="Create GitHub MCP Connection"
-                code={`-- Example: Create HTTP connection for GitHub MCP server
+
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
+                <h5 className="font-bold text-slate-900 mb-4">Enter the following values in the UI:</h5>
+                <div className="space-y-3 text-sm">
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Connection type:</span>
+                    <span className="text-slate-600">HTTP</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Name:</span>
+                    <span className="text-slate-600">github_mcp_connection_&lt;your_prefix&gt;</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Host:</span>
+                    <span className="text-slate-600">https://api.githubcopilot.com</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Port:</span>
+                    <span className="text-slate-600">443</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Base path:</span>
+                    <span className="text-slate-600">/mcp/</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Bearer token:</span>
+                    <span className="text-slate-600">Your GitHub Personal Access Token</span>
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <span className="font-semibold text-slate-700 min-w-[140px]">Is MCP connection:</span>
+                    <span className="text-slate-600">✓ Check this box</span>
+                  </div>
+                </div>
+              </div>
+
+              <InfoBox type="tip" title="Important: Check 'Is MCP connection'">
+                <p>Make sure to check the <strong>&quot;Is MCP connection&quot;</strong> checkbox when creating the connection. This enables MCP functionality and creates the proxy endpoint.</p>
+              </InfoBox>
+
+              <div className="mt-8 border-t-2 border-slate-200 pt-6">
+                <h5 className="text-lg font-bold text-slate-900 mb-3">Optional: Create Connection via SQL</h5>
+                <p className="text-slate-700 mb-4">
+                  Alternatively, you can create the connection programmatically using SQL in a <strong>notebook</strong> or the <strong>SQL editor</strong>:
+                </p>
+
+                <CodeBlock
+                  language="sql"
+                  title="Create GitHub MCP Connection (SQL Alternative)"
+                  code={`-- Optional: Create HTTP connection for GitHub MCP server using SQL
 -- Replace {name_prefix}, {secret_scope}, and {secret_key} with your own values
--- The secret key should be your GitHub Personal Access Token, you will need to get that from GitHub
+-- The secret key should be your GitHub Personal Access Token
+-- Run this in a Databricks notebook or SQL editor
+
 CREATE CONNECTION github_mcp_connection_{name_prefix}
   TYPE HTTP
   OPTIONS (
@@ -109,11 +163,11 @@ CREATE CONNECTION github_mcp_connection_{name_prefix}
     bearer_token secret('{secret_scope}', '{secret_key}'),
     is_mcp_connection true
 );`}
-              />
-
-              <InfoBox type="tip" title="Important Configuration">
-                <p>Make sure to check the <strong>&quot;Is MCP connection&quot;</strong> checkbox when creating the connection. This enables MCP functionality and creates the proxy endpoint.</p>
-              </InfoBox>
+                />
+                <p className="text-sm text-slate-600 mt-3">
+                  Note: When using the SQL approach, you&apos;ll need to first create a secret scope and store your GitHub token as a secret.
+                </p>
+              </div>
             </div>
 
             <InfoBox type="success" title="Connection Created!">
